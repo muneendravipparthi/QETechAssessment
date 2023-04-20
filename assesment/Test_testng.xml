@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="UI_ API_Suite">
+	<test name="reqres Tests">
+		<classes>
+			<class name="com.asses.runner.TestsRunner"></class>
+			<class name="com.asses.api.ReqresAPI"></class>
+		</classes>
+	</test> <!-- UI_test -->
+</suite> <!-- UI_Suite -->
