@@ -10,6 +10,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 
+import com.asses.pages.ReqresHomePage;
+
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
@@ -21,12 +23,15 @@ public class ReqresPageDefinitions {
 	private static WebDriver driver;
 	public final static int TIMEOUT = 10;
 	public final String url = "https://reqres.in/";
+	ReqresHomePage reqreshomepage;
 
 	@Before
 	public void setUp() {
+	
 		driver = new ChromeDriver();
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(TIMEOUT));
 		driver.manage().window().maximize();
+		reqreshomepage = new ReqresHomePage(driver);
 	}
 
 	@Given("Open the ChromeBrowser and launch the application")
@@ -36,11 +41,11 @@ public class ReqresPageDefinitions {
 
 	@When("User should able to list different request types, end points")
 	public void getListOfRequests() {
-		List<WebElement> we = driver.findElements(By.xpath("//div[@class='endpoints']//following-sibling::li"));
-		for (WebElement ele : we) {
-			System.out.println(" request types :: " + ele.getText());
-			ele.click();
-			String Url = driver.findElement(By.xpath("//span[@class='url']")).getText();
+		for (WebElement element : reqreshomepage.requestTypes) {
+			System.out.println(" request types :: " + element.getAttribute("data-http"));
+			System.out.println(" request :: " + element.getText());
+			element.click();
+			String Url = reqreshomepage.url.getText();
 			System.out.println("end point :: " + Url);
 
 		}
@@ -48,12 +53,11 @@ public class ReqresPageDefinitions {
 
 	@Then("User should display {string} details after selecting a specific option")
 	public void verifyDetailsOfEndPoint(String EndPoint) {
-		List<WebElement> we = driver.findElements(By.xpath("//div[@class='endpoints']//following-sibling::li"));
-		for (WebElement ele : we) {
-			if (ele.getText().contains(EndPoint)) {
-				ele.click();
-				String Url = driver.findElement(By.xpath("//span[@class='url']")).getText();
-				String Response = driver.findElement(By.xpath("//span[@data-key='response-code']")).getText();
+		for (WebElement element : reqreshomepage.requestTypes) {
+			if (element.getText().contains(EndPoint)) {
+				element.click();
+				String Url = reqreshomepage.url.getText();
+				String Response = reqreshomepage.response.getText();
 				Assert.assertEquals(Url, "/api/users/23", "URL not matched");
 				Assert.assertEquals(Response, "", "Response not matched");
 				break;
@@ -64,8 +68,7 @@ public class ReqresPageDefinitions {
 
 	@And("User should able to view button to navigate to support page")
 	public void verifySupportButtonIsPresent() {
-		WebElement supportbutton = driver.findElement(By.xpath("//div[@class=\"t-center\"]/button"));
-		Assert.assertTrue(supportbutton.isDisplayed(), "Support button not displayed");
+		Assert.assertTrue(reqreshomepage.supportbutton.isDisplayed(), "Support button not displayed");
 	}
 
 	@After
@@ -76,24 +79,21 @@ public class ReqresPageDefinitions {
 
 	@When("User click on support button")
 	public void user_click_on_support_button() {
-		WebElement supportbutton = driver.findElement(By.xpath("//div[@class=\"t-center\"]/button"));
-		supportbutton.click();
+		reqreshomepage.supportbutton.click();
 	}
 
 	@Then("User should list options for one-time & monthly support")
 	public void verifySupportOptions() {
-		WebElement oneTime = driver.findElement(By.xpath("//input[@id='supportOneTime']"));
-		WebElement monthlySupport = driver.findElement(By.xpath("//input[@id='supportRecurring']"));
-		Assert.assertTrue(oneTime.isDisplayed(), "one-time not displayed");
-		Assert.assertTrue(monthlySupport.isDisplayed(), "monthly support not displayed");
+		Assert.assertTrue(reqreshomepage.oneTimeRadioBtn.isDisplayed(), "one-time not displayed");
+		Assert.assertTrue(reqreshomepage.monthlySupportRadioBtn.isDisplayed(), "monthly support not displayed");
 
 	}
 
 	@Then("User should able to provide Upgrade details")
 	public void verifyUpgradeDetails() {
-		driver.findElement(By.id("trigger-pro")).click();
-		driver.findElement(By.id("mce-EMAIL")).sendKeys("test@tesmail.com");
-		driver.findElement(By.id("mc-embedded-subscribe")).click();
+		reqreshomepage.upgradeBtn.click();
+		reqreshomepage.emailIdInput.sendKeys("test@tesmail.com");
+		reqreshomepage.subscribeBtn.click();
 	}
 
 }
